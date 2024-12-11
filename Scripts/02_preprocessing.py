@@ -37,16 +37,11 @@ labelencoder = LabelEncoder()
 # Preprocessing kolom Gender 
 data['Gender'] = labelencoder.fit_transform(data['Gender'])
 
-# Direktori output
-output_dir = '../Data'
-
-# Membuat direktori output jika belum ada
-os.makedirs(output_dir, exist_ok=True)
-print(f"Output directory: {os.path.abspath(output_dir)}")
-
 # Menyimpan data ke file CSV setelah preprocessing
-output_path = os.path.join(output_dir, 'preprocessing.csv')  # Gabungkan path
-data.to_csv(output_path, index=False)  # Simpan file CSV tanpa index
+output_path = 'preprocessing.csv'  # Simpan file di lokasi script
+
+# Simpan file CSV tanpa index
+data.to_csv(output_path, index=False)
 
 # Validasi hasil penyimpanan
 if os.path.exists(output_path):
