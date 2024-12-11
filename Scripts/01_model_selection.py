@@ -35,7 +35,7 @@ train_data, test_data = train_test_split(data, test_size=0.2, random_state=42)
 train_data, valid_data = train_test_split(train_data, test_size=0.2, random_state=42)
 
 # Langkah keempat: Menyimpan hasil pemisahan ke file CSV
-output_dir = '../Data'
+output_dir = './Data'
 os.makedirs(output_dir, exist_ok=True)  # Membuat folder jika belum ada
 
 train_data.to_csv(os.path.join(output_dir, 'train.csv'), index=False)
