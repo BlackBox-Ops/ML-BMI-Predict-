@@ -1,0 +1,5 @@
+# Anggap file Python (.py) lebih signifikan
+*.py linguist-detectable=true
+
+# Kurangi bobot file Jupyter Notebook (.ipynb)
+*.ipynb linguist-generated=true
