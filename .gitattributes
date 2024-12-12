@@ -1,5 +1,18 @@
+# Create a .gitattributes content for language statistics
+gitattributes_content = """
+**/*.py linguist-language=Python
+**/*.ipynb linguist-language=Jupyter Notebook
+**/*.csv linguist-language=CSV
+
 # Anggap file Python (.py) lebih signifikan
 *.py linguist-detectable=true
 
 # Kurangi bobot file Jupyter Notebook (.ipynb)
 *.ipynb linguist-generated=true
+"""
+
+# Write the content to .gitattributes file
+with open('.gitattributes', 'w') as file:
+    file.write(gitattributes_content)
+
+print("The .gitattributes file has been created with the specified language statistics.")
