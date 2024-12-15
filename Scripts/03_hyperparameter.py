@@ -75,9 +75,9 @@ class RandomForestTuner:
 
         # Prepare datasheet 
         print("Preparing datasheet ....")
-        X_train, y_train = self.select_features(self.train_data)
-        X_valid, y_valid = self.select_features(self.valid_data)
-        X_test,  y_test = self.select_features(self.test_data)
+        X_train, y_train = self.select_features(self.train_data)   # Setting training data 
+        X_valid, y_valid = self.select_features(self.valid_data)   # Setting validation data 
+        X_test,  y_test = self.select_features(self.test_data)     # Setting testing data 
 
         # Perform hyperparameter tuning 
         print("Tuning Hyperparameters ...")
@@ -92,9 +92,9 @@ class RandomForestTuner:
 if __name__ == '__main__':
     # configuration 
 
-    DATA_DIR = 'Data'
-    FEATURE_COLUMNS = ['Gender','Height','Weight']
-    TARGET_COLUMNS = 'Index'
+    DATA_DIR = 'Data'  # Direktori Datasheet 
+    FEATURE_COLUMNS = ['Gender','Height','Weight'] # Pilih Fitur Gender, Height dan Weight sebagai variabel x
+    TARGET_COLUMNS = 'Index' # Pilih Fitur Index sebagai variabel y 
 
     # initialize and run the random tuner 
     tuner = RandomForestTuner(DATA_DIR, FEATURE_COLUMNS, TARGET_COLUMNS)
