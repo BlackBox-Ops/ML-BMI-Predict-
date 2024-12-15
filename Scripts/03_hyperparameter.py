@@ -1,10 +1,12 @@
 import os               # import library untuk operasi sistem seperti path folder atau file
 import pandas as pd     # import library untuk pengolahan dataframe 
 import joblib           # import library untuk simpan hyperparameter ke format joblib 
+import matplotlib.pyplot as plt 
 
-from sklearn.model_selection import train_test_split, GridSearchCV, KFold          # library untuk setting hyperparameter model 
-from sklearn.ensemble import RandomForestClassifier                                # library untuk membuat model random forest 
-from sklearn.metrics import accuracy_score, classification_report, roc_curve, auc  # library untuk mengukur akurasi model 
+from sklearn.model_selection import train_test_split, GridSearchCV, KFold  # library untuk setting hyperparameter model 
+from sklearn.ensemble import RandomForestClassifier   # library untuk membuat model random forest 
+from sklearn.metrics import accuracy_score, classification_report, roc_curve, auc, f1_score  # library untuk mengukur akurasi model 
+from log import TrainingLogger
 
 # buat class oop dengan nama Random Forest Tuner 
 class RandomForestTuner:
