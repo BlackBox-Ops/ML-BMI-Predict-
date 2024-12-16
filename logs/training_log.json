@@ -795,9 +795,9 @@
         "test_f1_score": 0.8694004486456347
     },
     "logging": {
-        "training_start_time": "2024-12-15T14:11:58.509761Z",
-        "training_end_time": "2024-12-15T14:12:36.065803Z",
-        "training_duration": 37.556042,
+        "training_start_time": "2024-12-16T07:26:52.992850Z",
+        "training_end_time": "2024-12-16T07:27:31.965818Z",
+        "training_duration": 38.972968,
         "exception": null
     }
 }
