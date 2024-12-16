@@ -125,7 +125,7 @@ if __name__ == '__main__':
     DATA_DIR = 'data'  # Folder data
     FEATURE_COLUMNS = ['Gender', 'Height', 'Weight']  # Kolom fitur
     TARGET_COLUMN = 'Index'  # Kolom target
-    # OUTPUT_DIR = 'output'  # Folder untuk output
+    OUTPUT_DIR = 'output'  # Folder untuk output
 
     # Hyperparameter terbaik (contoh)
     BEST_PARAMS = {
@@ -136,5 +136,5 @@ if __name__ == '__main__':
     }
 
     # Inisialisasi trainer dan jalankan
-    trainer = RandomForestTrainer(DATA_DIR, FEATURE_COLUMNS, TARGET_COLUMN, BEST_PARAMS) #,OUTPUT_DIR)
+    trainer = RandomForestTrainer(DATA_DIR, FEATURE_COLUMNS, TARGET_COLUMN, BEST_PARAMS, OUTPUT_DIR)
     trainer.run()
