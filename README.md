@@ -1,5 +1,3 @@
-# ML-Bmi-Predict
-
 # BMI Classification Using Voting Classifier Algorithm
 Model Prediksi BMI
 
@@ -12,20 +10,28 @@ Untuk mengatur proyek ini, ikuti langkah-langkah berikut:
 
 1. Clone repositori ini ke komputer Anda:
    ```bash
-   git clone <repository_url>
+   git clone https://github.com/BlackBox-Ops/ML-Bmi-Predict.git
    ```
 
-2. Masuk ke direktori proyek:
-   ```bash
-   cd <project_directory>
-   ```
-
-3. Install paket Python yang diperlukan:
+2. Install paket Python yang diperlukan:
    ```bash
    pip install -r requirements.txt
    ```
-
 Pastikan Anda memiliki Python 3.7 atau versi yang lebih baru sebelum melanjutkan.
+
+3. Masuk ke direktori proyek:
+   ```bash
+   cd Scripts/
+   ```
+4. Dan jalankan kode program di direktori Scripts:
+   ```bash
+   python api_model.py
+   ```
+
+5. jika pada kode program api_model.py berhasil dijalankan maka akan tampil alamat address sebagai berikut
+   ```bash
+   http://127.0.0.1:8000 
+   ```
 
 ## Penggunaan
 
@@ -38,7 +44,7 @@ Model ini dilatih menggunakan dataset yang mengandung data terkait BMI. Setelah 
 2. Latih model (jika diperlukan) atau muat model yang sudah dilatih.
 3. Gunakan model untuk membuat prediksi pada data baru.
 
-Lihat file `main.py` atau skrip terkait untuk instruksi penggunaan spesifik.
+Lihat file `api_model.py` atau skrip terkait untuk instruksi penggunaan spesifik.
 
 ## Informasi Dataset
 Dataset yang digunakan untuk proyek ini mengandung kolom-kolom berikut:
