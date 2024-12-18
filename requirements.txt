@@ -4,3 +4,6 @@ matplotlib
 seaborn
 scipy
 scikit-learn
+fastapi
+uvicorn
+xgboost
