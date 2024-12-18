@@ -7,3 +7,4 @@ scikit-learn
 fastapi
 uvicorn
 xgboost
+flask
