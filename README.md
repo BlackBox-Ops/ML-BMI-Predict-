@@ -1,6 +1,6 @@
 # ML-Bmi-Predict
 
-# Judul Proyek
+# BMI Classification Using Voting Classifier Algorithm
 Model Prediksi BMI
 
 ## Deskripsi Proyek
