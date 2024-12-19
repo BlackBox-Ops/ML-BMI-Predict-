@@ -2,7 +2,7 @@
 Model Prediksi BMI
 
 ## Deskripsi Proyek
-Proyek ini dirancang untuk memprediksi Body Mass Index (BMI) individu berdasarkan fitur-fitur tertentu seperti tinggi badan, berat badan, dan data terkait lainnya. Model ini menggunakan teknik machine learning untuk menganalisis dan memprediksi kategori BMI (misalnya, kurus, normal, kelebihan berat badan, obesitas). Proyek ini dapat digunakan dalam aplikasi kesehatan, sistem pelacakan kebugaran, atau alat edukasi.
+Proyek ini dirancang untuk memprediksi Status Kesehatan individu berdasarkan fitur-fitur tertentu seperti tinggi badan, berat badan, dan data terkait lainnya. Model ini menggunakan teknik machine learning untuk menganalisis dan memprediksi kategori BMI (misalnya, kurus, normal, kelebihan berat badan, obesitas). Proyek ini dapat digunakan dalam aplikasi kesehatan, sistem pelacakan kebugaran, atau alat edukasi.
 
 ## Instalasi
 
