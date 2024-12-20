@@ -8,3 +8,5 @@ fastapi
 uvicorn
 xgboost
 flask
+psycopg2-binary 
+flask-sqlalchemy
