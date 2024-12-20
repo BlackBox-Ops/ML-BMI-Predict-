@@ -47,7 +47,7 @@ with app.app_context():
 @app.route("/")
 def home():
     # Render halaman HTML utama
-    return render_template("index.html")
+    return render_template("prediction.html")
 
 @app.route("/predict", methods=["POST"])
 def predict_bmi():

@@ -1,0 +1,92 @@
+/* General body styling */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f7fa;
+}
+
+/* Custom header styling */
+#title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 3rem;
+    color: #6a0dad;
+}
+
+/* Icon styling */
+#wizardIcon {
+    color: #6a0dad;
+    font-size: 2.5rem;
+}
+
+/* Button styles */
+.btn {
+    border-radius: 0;
+}
+
+.btn-success {
+    background-color: #28a745;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: white;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+/* Table styling */
+.table th, .table td {
+    vertical-align: middle;
+}
+
+/* Add some space for elements */
+.mt-4 {
+    margin-top: 1rem;
+}
+
+/* Alert styling */
+#alert {
+    font-size: 1rem;
+}
+
+/* Prediction Result Styling */
+#result {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #28a745;
+}
+
+/* Row hover effect for table */
+.table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Styling tambahan untuk card success */
+.card.bg-success {
+    background-color: #28a745 !important; /* Hijau Bootstrap */
+    border: none;
+}
+
+.card.bg-success .card-header {
+    background-color: #218838; /* Warna hijau lebih gelap */
+    border-bottom: 2px solid #1e7e34; /* Pemberian border bawah */
+}
+
+.card.bg-success .card-header h5,
+.card.bg-success .card-body,
+.card.bg-success .card-footer {
+    color: white;
+}
+
+/* Tabel tetap readable di card hijau */
+.table-success {
+    background-color: #d4edda; /* Warna tabel hijau muda */
+}
+
+.table-success th,
+.table-success td {
+    color: #155724; /* Warna teks hijau gelap */
+}
+
