@@ -22,11 +22,6 @@ def index():
     return render_template('index.html', rows=[{
         'id': r[0], 'gender': r[1], 'height': r[2], 'weight': r[3], 'result':r[4]} for r in rows])
 
-@app.route('/edit/<int:id>', methods=['GET'])
-def edit(id):
-    # Logic for editing (fetch data, display form, save changes)
-    return f"Edit user with ID {id}"
-
 @app.route('/delete/<int:id>', methods=['POST'])
 def delete(id):
     cur = conn.cursor()

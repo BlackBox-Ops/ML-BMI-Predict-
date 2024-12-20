@@ -38,11 +38,6 @@
                     <td>{{ row.weight }}</td>
                     <td>{{ row.result }}</td>
                     <td class="table-actions">
-                        <form action="/edit/{{ row.id }}" method="get" style="display:inline;">
-                            <button type="submit" class="btn btn-warning btn-sm">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                        </form>
                         <form action="/delete/{{ row.id }}" method="post" style="display:inline;">
                             <button type="submit" class="btn btn-danger btn-sm">
                                 <i class="fas fa-trash-alt"></i> Delete
