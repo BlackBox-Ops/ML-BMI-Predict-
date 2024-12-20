@@ -88,6 +88,39 @@ function changeTitleText(newText) {
     });
 }
 
+// Fetch and update the prediction table
+function updateTable() {
+    fetch('/history')
+        .then((response) => response.json())
+        .then((data) => {
+            const tableBody = document.getElementById('predictionTable');
+            tableBody.innerHTML = '';
+            data.forEach((item, index) => {
+                const row = `<tr>
+                    <td>${index + 1}</td>
+                    <td>${item.gender}</td>
+                    <td>${item.height}</td>
+                    <td>${item.weight}</td>
+                    <td>${item.result}</td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        });
+}
+
+function showAlert(type, message) {
+    const alertDiv = document.getElementById('alert');
+    alertDiv.className = `alert alert-${type} d-block`;
+    alertDiv.innerHTML = message;
+
+    setTimeout(() => {
+        alertDiv.className = 'alert d-none';
+    }, 5000);
+}
+
+// Initial load of the table
+updateTable();
+
 // Fungsi untuk mereset hasil prediksi
 function resetResult() {
     document.getElementById('result').value = '';
