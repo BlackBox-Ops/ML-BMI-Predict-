@@ -31,8 +31,10 @@
         .table td, .table th {
             word-wrap: break-word;
         }
-        .alert {
-            display: none; /* Initially hide alerts */
+
+        /* Ensuring the result card is hidden initially */
+        #predictionResultCard {
+            display: none;
         }
     </style>
 </head>
@@ -73,15 +75,15 @@
                 </form>
             </div>
 
+            <!-- Alert Section -->
+            <div id="alert" class="alert d-none mt-4" role="alert"></div>
+
             <!-- Result Section -->
             <div class="col-md-6">
-                <div class="bg-white p-4 shadow-sm">
+                <div id="predictionResultCard" class="bg-white p-4 shadow-sm">
                     <h5><i class="fas fa-chart-line"></i> Prediction Result:</h5>
                     <input type="text" id="result" class="form-control" readonly>
                 </div>
-
-                <!-- Alert Section -->
-                <div id="alert" class="alert mt-4" role="alert"></div>
             </div>
         </div>
 
@@ -91,13 +93,15 @@
                 <div class="card card-secondary p-3">
                     <div class="d-flex justify-content-between mb-3">
                         <h5 class="mb-0"><i class="fas fa-database"></i> Data Table</h5>
-                        <button id="saveCSV" class="btn btn-success w-10S">
-                            <i class="fas fa-file-csv"></i> Save as CSV
-                        </button>
-                        <!-- New Print Button -->
-                        <button id="printButton" class="btn btn-primary ms-2">
-                            <i class="fas fa-print"></i> Print
-                        </button>
+                        <div>
+                            <button id="saveCSV" class="btn btn-success w-10S">
+                                <i class="fas fa-file-csv"></i> Save as CSV
+                            </button>
+                            <!-- New Print Button -->
+                            <button id="printButton" class="btn btn-primary ms-2">
+                                <i class="fas fa-print"></i> Print
+                            </button>
+                        </div>
                     </div>
                     <table class="table table-striped table-bordered">
                         <thead class="table-dark">
@@ -143,58 +147,67 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JavaScript -->
     <script>
-        // Function to display the alert
+        // Fungsi untuk menampilkan alert
         function showAlert(type, message) {
             const alertDiv = document.getElementById('alert');
-            alertDiv.className = `alert alert-${type} d-block`; // Add 'alert' class dynamically
-            alertDiv.innerHTML = message; // Set the message
+            alertDiv.className = `alert alert-${type} d-block`;
+            alertDiv.innerHTML = message;
 
-            // Hide alert after 3 seconds (3000 ms)
+            // Sembunyikan alert setelah 3 detik
             setTimeout(() => {
-                alertDiv.className = 'alert d-none'; // Hide the alert
+                alertDiv.className = 'alert d-none';
             }, 3000);
         }
 
         // Handle form submission
         document.getElementById('bmiForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
+            event.preventDefault(); // Prevent default form submission
 
             const gender = document.getElementById('gender').value;
             const height = document.getElementById('height').value;
             const weight = document.getElementById('weight').value;
 
-            const response = await fetch('/predict', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    gender: parseInt(gender),
-                    height: parseFloat(height),
-                    weight: parseFloat(weight)
-                })
-            });
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        gender: parseInt(gender),
+                        height: parseFloat(height),
+                        weight: parseFloat(weight)
+                    })
+                });
 
-            const data = await response.json();
+                const data = await response.json();
 
-            if (data.prediction) {
-                // Display result
-                document.getElementById('result').value = data.prediction;
-                
-                // Show success alert
-                showAlert('success', `Prediction Success! Result: ${data.prediction}`);
+                if (data.prediction) {
+                    // Display result in the prediction field
+                    document.getElementById('result').value = data.prediction;
 
-                // Set timeout to reset the result and hide alert after 3 minutes (180000 ms)
-                setTimeout(function() {
-                    document.getElementById('result').value = ''; // Reset the result field
-                    showAlert('info', 'Prediction Reset');
-                }, 180000); // 3 minutes = 180000 ms
+                    // Show success alert
+                    showAlert('success', 'Prediction successful!');
 
-                // Reload the table with new data (optional)
-                location.reload();
-            } else if (data.error) {
-                // Show error alert
-                showAlert('warning', `Prediction Failed: ${data.error}`);
+                    // Show the prediction result card if hidden
+                    // document.getElementById('predictionResultCard').style.display = 'block';
+
+                    // Reset result after 60 seconds
+                    setTimeout(function() {
+                        document.getElementById('result').value = '';
+                        document.getElementById('predictionResultCard').style.display = 'none'; // Hide the result card again
+                    }, 60000);
+
+                    // Reload the table with new data
+                    location.reload();
+                } else {
+                    // Show error alert if prediction is not available
+                    showAlert('danger', 'Prediction failed. Please try again.');
+                }
+            } catch (error) {
+                // Show error alert if an error occurs
+                console.error('Error during prediction:', error);
+                showAlert('danger', 'An error occurred. Please try again.');
             }
         });
     </script>

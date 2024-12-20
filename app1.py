@@ -1,7 +1,4 @@
-# app.py
-from flask import Flask, render_template, request, redirect, url_for
-from flask import request, render_template, jsonify
-
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import psycopg2
 import joblib
 import numpy as np 
@@ -52,7 +49,7 @@ def index():
     rows = cur.fetchall()
     cur.close()
     conn.close()
-    return render_template('index.html', rows=[{
+    return render_template('index1.html', rows=[{
         'id': r[0], 'gender': r[1], 'height': r[2], 'weight': r[3], 'result': r[4]
     } for r in rows])
 
