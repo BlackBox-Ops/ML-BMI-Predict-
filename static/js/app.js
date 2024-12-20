@@ -12,8 +12,16 @@ document.getElementById('bmiForm').addEventListener('submit', function (event) {
         return;
     }
 
-    // Tampilkan indikator loading
+    // Tampilkan indikator loading dan animasi pada icon dan title
     showAlert('info', '<i class="fas fa-spinner fa-spin"></i> Predicting...');
+    const wizardIcon = document.getElementById('wizardIcon');
+    const title = document.getElementById('title');
+
+    // Tambahkan animasi icon spin
+    wizardIcon.classList.add('fa-spin');
+
+    // Ubah tulisan menjadi "Analyzer"
+    changeTitleText("Analyzer");
 
     // Payload untuk API
     const payload = {
@@ -43,6 +51,14 @@ document.getElementById('bmiForm').addEventListener('submit', function (event) {
         .catch((error) => {
             showAlert('danger', `Error: ${error}`);
             document.getElementById('result').value = '';
+        })
+        .finally(() => {
+            // Kembalikan title ke "BMI Wizard" dan reset hasil setelah 5 detik
+            setTimeout(() => {
+                wizardIcon.classList.remove('fa-spin');
+                changeTitleText("BMI Wizard");
+                resetResult();
+            }, 5000);
         });
 });
 
@@ -55,5 +71,27 @@ function showAlert(type, message) {
     // Sembunyikan alert setelah 5 detik
     setTimeout(() => {
         alertDiv.className = 'alert d-none';
-    }, 5000);
+    }, 3000);
+}
+
+// Fungsi untuk mengubah teks title huruf per huruf
+function changeTitleText(newText) {
+    const title = document.getElementById('title');
+    title.innerHTML = ''; // Kosongkan teks lama
+
+    // Tambahkan huruf per huruf dengan animasi
+    [...newText].forEach((char, index) => {
+        const span = document.createElement('span');
+        span.textContent = char;
+        span.style.animationDelay = `${index * 0.1}s`;
+        title.appendChild(span);
+    });
+}
+
+// Fungsi untuk mereset hasil prediksi
+function resetResult() {
+    document.getElementById('result').value = '';
+    document.getElementById('gender').value = '';
+    document.getElementById('height').value = '';
+    document.getElementById('weight').value = '';
 }

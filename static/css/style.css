@@ -1,10 +1,11 @@
 
 body {
-    font-family: 'Arial', sans-serif;
+    font-family:fantasy
 }
 
 h1 {
     color: #007BFF;
+    font-family:fantasy
 }
 
 .card {
@@ -162,4 +163,38 @@ thead {
 tbody tr:hover {
     background-color: #f1f1f1;
     cursor: pointer;
+}
+
+/* Efek animasi berputar untuk ikon tongkat sihir */
+@keyframes iconSpin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Tambahkan gaya untuk ikon tongkat saat animasi aktif */
+#wizardIcon.fa-spin {
+    animation: iconSpin 1s linear infinite;
+}
+
+/* Animasi perubahan teks huruf per huruf */
+@keyframes textChange {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Efek fade-in setiap huruf */
+#title span {
+    display: inline-block;
+    opacity: 0;
+    animation: textChange 0.5s ease-in-out forwards;
 }
