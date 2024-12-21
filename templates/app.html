@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMI Oracle - AdminLTE Style</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f6f9;
+        }
+        /* Navbar Styling */
+        .navbar {
+            height: 56px;
+            background-color: #343a40;
+            border-bottom: 1px solid #4f5962;
+            z-index: 1030;
+            display: flex;
+            justify-content: space-between;
+        }
+        .navbar-brand {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            margin-left: 15px;
+        }
+        .navbar-toggler {
+            border: none;
+            color: white;
+        }
+        /* Sidebar Styling */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            top: 56px;
+            left: 0;
+            background-color: #343a40;
+            padding: 10px 0;
+            overflow-y: auto;
+            transition: transform 0.3s ease-in-out;
+            z-index: 1020;
+        }
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+        .sidebar a {
+            color: #c2c7d0;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        .sidebar a i {
+            margin-right: 10px;
+        }
+        .sidebar a:hover {
+            background-color: #495057;
+            color: white;
+        }
+        .sidebar .menu-title {
+            padding: 10px 20px;
+            font-size: 14px;
+            color: #6c757d;
+            text-transform: uppercase;
+        }
+        /* Main Content */
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: margin-left 0.3s ease-in-out;
+        }
+        .content.collapsed {
+            margin-left: 0;
+        }
+        .content p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        /* Flex Layout for Content and Cards */
+        .content-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        /* Card Container */
+        .card-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: nowrap; /* Prevent cards from wrapping */
+            gap: 10px; /* Reduce gap between cards to 10px */
+            margin-top: 10px;
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        /* Individual Card */
+        .card {
+            flex: 1 3 200px; /* Fix width, adjust accordingly */
+            height: 100px; /* Adjust height */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 15px;
+            position: relative;
+            background-color: rgba(220, 53, 69, 0.6); /* Slightly transparent background */
+            transition: background-color 0.3s ease;
+        }
+
+        /* Card hover effect */
+        .card:hover {
+            background-color: rgba(220, 53, 69, 1); /* On hover, full color */
+        }
+
+        .card .count {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-right: 10px; /* Space between count and icon */
+        }
+
+        .card .label {
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+
+        .card .icon {
+            font-size: 2rem; /* Icon size reduced */
+            position: absolute;
+            left: 15px; /* Align icon to the left of the count */
+        }
+
+        .card .count-and-icon {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 1200px) {
+            .card {
+                flex: 0 0 30%; /* Reduce width on medium screens */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                flex: 0 0 45%; /* Reduce width on small screens */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                flex: 0 0 90%; /* Stack cards on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a class="navbar-brand ms-2" href="#">BMI Oracle</a>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+        <div class="menu-title">Main Menu</div>
+        <a href="#"><i class="fas fa-home"></i> Home</a>
+        <a href="#"><i class="fas fa-star"></i> Features</a>
+        <a href="#"><i class="fas fa-envelope"></i> Contact</a>
+        <a href="#"><i class="fas fa-info-circle"></i> About</a>
+    </aside>
+
+    <!-- Content -->
+    <main id="content" class="content">
+        <div class="container-fluid content-container">
+            <div>
+                <h1 class="mb-4">Welcome to BMI Oracle</h1>
+                <p>
+                    Your magical tool for BMI calculations and health insights. This website is based on artificial intelligence, 
+                    utilizing ensemble methods by combining algorithms like Support Vector Machine (SVM), 
+                    Naive Bayes, Random Forest (RF), and XGBoost (XB) to provide accurate predictions and insights.
+                </p>
+            </div>
+            <div class="card-container">
+                <div class="card" style="background-color: grey;">
+                    <div class="count-and-icon">
+                        <i class="fas fa-users icon"></i>
+                        <div class="count">15</div>
+                    </div>
+                    <div class="label">Gizi Buruk</div>
+                </div>
+                <div class="card" style="background-color: skyblue;">
+                    <div class="count-and-icon">
+                        <i class="fas fa-users icon"></i>
+                        <div class="count">33</div>
+                    </div>
+                    <div class="label">Kurus</div>
+                </div>
+                <div class="card" style="background-color: green;">
+                    <div class="count-and-icon">
+                        <i class="fas fa-users icon"></i>
+                        <div class="count">50</div>
+                    </div>
+                    <div class="label">Normal</div>
+                </div>
+                <div class="card" style="background-color: orange;">
+                    <div class="count-and-icon">
+                        <i class="fas fa-users icon"></i>
+                        <div class="count">39</div>
+                    </div>
+                    <div class="label">Kelebihan Berat Badan</div>
+                </div>
+                <div class="card" style="background-color: orangered;">
+                    <div class="count-and-icon">
+                        <i class="fas fa-users icon"></i>
+                        <div class="count">27</div>
+                    </div>
+                    <div class="label">Obesitas</div>
+                </div>
+                <div class="card" style="background-color: black;">
+                    <div class="count-and-icon">
+                        <i class="fas fa-users icon"></i>
+                        <div class="count">0</div>
+                    </div>
+                    <div class="label">Extreme</div>
+                </div>
+            </div>
+        </div>
+    </main>    
+
+    <!-- Content -->
+    <main id="content" class="content">
+        <div class="container-fluid content-container">
+            <div>
+                <h1 class="mb-4">Welcome to BMI Oracle</h1>
+                <p>
+                    Your magical tool for BMI calculations and health insights. This website is based on artificial intelligence, 
+                    utilizing ensemble methods by combining algorithms like Support Vector Machine (SVM), 
+                    Naive Bayes, Random Forest (RF), and XGBoost (XB) to provide accurate predictions and insights.
+                </p>
+            </div>
+            <div class="card-container">
+                <div class="card" style="background-color: grey;">
+                    <div class="count-and-icon">
+                        <i class="fas fa-users icon"></i>
+                        <div class="count">15</div>
+                    </div>
+                    <div class="label">Gizi Buruk</div>
+                </div>
+                <div class="card" style="background-color: skyblue;">
+                    <div class="count-and-icon">
+                        <i class="fas fa-users icon"></i>
+                        <div class="count">33</div>
+                    </div>
+                    <div class="label">Kurus</div>
+                </div>
+                <div class="card" style="background-color: green;">
+                    <div class="count-and-icon">
+                        <i class="fas fa-users icon"></i>
+                        <div class="count">50</div>
+                    </div>
+                    <div class="label">Normal</div>
+                </div>
+                <div class="card" style="background-color: orange;">
+                    <div class="count-and-icon">
+                        <i class="fas fa-users icon"></i>
+                        <div class="count">39</div>
+                    </div>
+                    <div class="label">Kelebihan Berat Badan</div>
+                </div>
+                <div class="card" style="background-color: orangered;">
+                    <div class="count-and-icon">
+                        <i class="fas fa-users icon"></i>
+                        <div class="count">27</div>
+                    </div>
+                    <div class="label">Obesitas</div>
+                </div>
+                <div class="card" style="background-color: black;">
+                    <div class="count-and-icon">
+                        <i class="fas fa-users icon"></i>
+                        <div class="count">0</div>
+                    </div>
+                    <div class="label">Extreme</div>
+                </div>
+            </div>
+        </div>
+    </main>    
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const content = document.getElementById('content');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('hidden');
+            content.classList.toggle('collapsed');
+        });
+    </script>
+</body>
+</html>
