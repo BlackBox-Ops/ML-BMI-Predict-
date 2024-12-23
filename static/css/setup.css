@@ -1,0 +1,183 @@
+
+    .brand-link {
+        text-decoration: none !important;
+        display: flex;
+        align-items: center;
+    }
+
+    .brand-image {
+        margin-right: 10px;
+    }
+
+    .sidebar-mini.sidebar-collapse .brand-link {
+        display: none;
+    }
+
+    /* Styling untuk paragraf */
+    section.content p {
+        font-size: 1.125rem;
+        line-height: 1.6;
+        color: #333;
+        margin-bottom: 20px;
+        background-color: #f8f9fa; /* Warna latar belakang cerah untuk kesan bersih */
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Bayangan halus untuk efek kedalaman */
+        font-family: 'Arial', sans-serif;
+    }
+
+    /* Gaya untuk badge */
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 12px 20px;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+        color: white;
+        text-decoration: none; /* Menghapus underline jika badge adalah tautan */
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Hover effect untuk badge */
+    .badge:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Badge kategori */
+    .badge-danger {
+        background-color: #dc3545;
+    }
+
+    .badge-warning {
+        background-color: #ffc107;
+        color: #212529; /* Warna teks gelap agar kontras dengan latar belakang terang */
+    }
+
+    .badge-success {
+        background-color: #28a745;
+    }
+
+    .badge-info {
+        background-color: #17a2b8;
+    }
+
+    .badge-primary {
+        background-color: #007bff;
+    }
+
+    .badge-dark {
+        background-color: #343a40;
+    }
+
+    /* Gaya untuk ikon dalam badge */
+    .badge i {
+        font-size: 1.25rem;
+        margin-right: 10px; /* Memberikan jarak antar ikon dan teks */
+    }
+
+    /* Responsif untuk ukuran layar kecil */
+    @media (max-width: 768px) {
+        .badge {
+            font-size: 0.875rem;
+            padding: 8px 16px; /* Padding lebih kecil pada layar kecil */
+        }
+    }
+
+    .container-fluid {
+        margin-top: 20px;
+    }
+
+    #show-ai-form {
+        margin-bottom: 20px;
+    }
+
+    #ai-form {
+        border-radius: 0.5rem;
+        display: none; /* Form disembunyikan secara default */
+    }
+
+    .table th, .table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    /* Gaya ketika tombol prediksi dijalankan */
+    .container-fluid.split-view #ai-form {
+        display: block;
+        width: 48%; /* Setengah layar untuk form */
+        float: right; /* Posisikan form ke kanan */
+    }
+
+    .container-fluid.split-view .table-container {
+        width: 48%; /* Setengah layar untuk tabel */
+        float: left; /* Posisikan tabel ke kiri */
+    }
+
+    .container-fluid.split-view::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+    /* Responsif */
+    @media (max-width: 768px) {
+        .container-fluid.split-view #ai-form,
+        .container-fluid.split-view .table-container {
+            width: 100%; /* Full width pada layar kecil */
+            float: none;
+        }
+        #ai-form {
+            margin-top: 20px;
+        }
+    }
+
+    .content-header {
+        padding: 0px;
+    }
+
+    /* Gaya untuk heading utama */
+    .welcome-heading {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 10px;
+        line-height: 1.3;
+        font-family: 'Arial', sans-serif;
+    }
+
+    /* Gaya untuk subheading */
+    .subheading {
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: #666;
+        line-height: 1.6;
+        font-family: 'Arial', sans-serif;
+    }
+
+    /* Gaya untuk ikon di subheading */
+    .subheading i {
+        font-size: 1.75rem;
+        margin-left: 10px;
+    }
+
+    /* Responsif untuk ukuran layar kecil */
+    @media (max-width: 768px) {
+        .welcome-heading {
+            font-size: 2rem;
+        }
+
+        .subheading {
+            font-size: 1.25rem;
+        }
+    }
+
+    /* Mengurangi jarak antara h1 dan p */
+    .welcome-heading {
+        margin-bottom: 10px; /* Kurangi margin bawah pada h1 */
+    }
+
+    section.content p {
+        margin-top: 0; /* Hapus margin atas pada p */
+    }
