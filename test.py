@@ -1,30 +1,28 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 from dotenv import load_dotenv
-
 import joblib
-import numpy as np 
-import os 
+import numpy as np
+import os
 import psycopg2
 import logging
 
-# memuat variabel lingkungan dari file .env 
+# Load environment variables from .env file
 load_dotenv()
 
-# Mengatur logging
+# Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-# Load model machine learning 
+# Load machine learning model
 MODEL_PATH = "voting_classifier_model.joblib"
 
-# membuat koneksi ke database 
+# Database connection settings from environment variables
 DB_HOST = os.getenv('DB_HOST')
 DB_NAME = os.getenv('DB_NAME')
 DB_USER = os.getenv('DB_USER')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_PORT = os.getenv('DB_PORT')
 
-
-# Define the label mapping untuk hasil prediksi model machine learning 
+# Label mapping for BMI prediction results
 LABEL_MAPPING = {
     0: "Extremely Weak",
     1: "Weak",
@@ -34,102 +32,39 @@ LABEL_MAPPING = {
     5: "Extreme Obesity"
 }
 
+# Initialize Flask app
 app = Flask(__name__)
 
-# buat function untuk load model machine learning 
+# Load machine learning model function
 def load_model(path):
-    # test apabila model berhasil dibaca
     try:
         return joblib.load(path)
     except Exception as e:
-        # test apabila model tidak berhasil dibaca 
-        raise RuntimeError(f'Failed to load model : {e}')
+        raise RuntimeError(f"Failed to load model: {e}")
 
-# load the model & inisialisasi postgresql connection 
+# Load the machine learning model
 model = load_model(MODEL_PATH)
 
-# buat fungsi untuk koneksi ke database 
+# Database connection function
 def get_db_connection():
     return psycopg2.connect(
-        dbname=os.getenv("DB_NAME"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        host=os.getenv("DB_HOST"),
-        port=os.getenv("DB_PORT")
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        host=DB_HOST,
+        port=DB_PORT
     )
 
-# buat function untuk menghitung nilai bmi 
+# Function to calculate BMI
 def calculate_bmi(height, weight):
-    height_m = height / 100
-    bmi = weight / (height_m ** 2)
-    return round(bmi, 2)
+    height_m = height / 100  # Convert height to meters
+    return round(weight / (height_m ** 2), 2)
 
-# buat function untuk menampilkan isi dari tabel bmi_predict 
-@app.route('/')
-def index():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM bmi_predict;")
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
-    
-    # Convert database rows into a list of dictionaries
-    rows = [
-        {
-            'id': row[0],
-            'gender': row[1],
-            'height': row[2],
-            'weight': row[3],
-            'bmi': row[4],
-            'result': row[5],
-        }
-        for row in rows
-    ]
-    return render_template('test.html', rows=rows)
-
-# buat function untuk prediksi dan perhitungan bmi lalu simpan ke database 
-@app.route('/predict', methods=['POST'])
-def predict_bmi():
-    # handle bmi prediction and store results in the database 
-    try:
-        data = request.get_json()
-        gender = "Male" if data["gender"] == 0 else "Female"
-        height = data["height"]
-        weight = data["weight"]
-
-        # calculate bmi 
-        bmi = calculate_bmi(weight, height)
-
-        # prepare data for prediction 
-        input_data = np.array([{data['gender'], height, weight}])
-        prediction = model.predict(input_data)
-
-        # map prediction to label 
-        prediction_label = LABEL_MAPPING.get(prediction[0], "Unknown")
-
-        # store prediction in the database 
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute(
-            "INSERT INTO predictions (gender, height, weight, bmi, result) VALUES (%s, %s, %s, %s, %s)",
-            (gender, height, weight, bmi, prediction_label)
-        )
-        conn.commit()
-        cur.close()
-        conn.close()
-
-        return jsonify({'prediction':prediction_label, 'bmi':bmi})
-
-    except Exception as e:
-        return jsonify({"error": f"Prediction error: {e}"}), 500
-    
-# buat function update data 
+# Function to reorder IDs starting from 3
 def reorder_ids():
-    # reorder the ids in the database to maintain sequential order 
     conn = get_db_connection()
     cur = conn.cursor()
-    try :
+    try:
         cur.execute("""
             WITH reordered AS (
                 SELECT id, ROW_NUMBER() OVER () AS new_id
@@ -145,37 +80,98 @@ def reorder_ids():
         cur.close()
         conn.close()
 
-# buat function untuk menghapus data dari database 
+# Route to display all records from the database
+@app.route('/')
+def index():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM bmi_predict;")
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    # Convert query result to a list of dictionaries
+    rows = [
+        {
+            'id': row[5],
+            'gender': row[0],
+            'height': row[1],
+            'weight': row[2],
+            'bmi': row[3],
+            'status': row[4],
+        }
+        for row in rows
+    ]
+    return render_template('test1.html', rows=rows)
+
+# Route for BMI prediction and storing the result in the database
+@app.route('/predict', methods=['POST'])
+def predict_bmi():
+    try:
+        data = request.get_json()
+        gender = "Male" if data["gender"] == 0 else "Female"
+        height = data["height"]
+        weight = data["weight"]
+
+        # Calculate BMI
+        bmi = calculate_bmi(height, weight)
+
+        # Prepare data for prediction
+        input_data = np.array([[data['gender'], height, weight]])
+        prediction = model.predict(input_data)
+
+        # Map prediction result to label
+        prediction_label = LABEL_MAPPING.get(prediction[0], "Unknown")
+
+        # Store prediction in the database
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO bmi_predict (gender, height, weight, bmi, status) VALUES (%s, %s, %s, %s, %s)",
+            (gender, height, weight, bmi, prediction_label)
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        # Reorder IDs after inserting new data
+        reorder_ids()
+
+        return jsonify({'prediction': prediction_label, 'bmi': bmi})
+
+    except Exception as e:
+        return jsonify({"error": f"Prediction error: {e}"}), 500
+
+# Route to delete a record from the database
 @app.route('/delete/<int:id>', methods=['POST'])
 def delete(id):
-    # delete hasil prediksi dari kolom database 
     conn = get_db_connection()
     cur = conn.cursor()
     try:
-        # delete the record with specified id 
-        cur.execute("DELETE FROM bmi_predict WHERE id = %s",  (id,))
+        cur.execute("DELETE FROM bmi_predict WHERE id = %s", (id,))
         conn.commit()
     finally:
         cur.close()
         conn.close()
 
-    # call function reorder_ids()
+    # Reorder IDs after deletion
     reorder_ids()
 
     return redirect(url_for('index'))
 
+# Function to reset the ID sequence
 def reset_sequence():
-    """Reset the ID sequence to match the current maximum ID."""
     conn = get_db_connection()
     cur = conn.cursor()
     try:
         cur.execute("""
-            SELECT setval('predictions_id_seq', (SELECT MAX(id) FROM bmi_predict));
+            SELECT setval('bmi_predict_id_seq', (SELECT MAX(id) FROM bmi_predict));
         """)
         conn.commit()
     finally:
         cur.close()
         conn.close()
-    
+
+# Run the Flask app
 if __name__ == '__main__':
     app.run(debug=True)

@@ -196,7 +196,9 @@
                 <!-- Tabel -->
                 <div class="row">
                     <div class="col-12">
-                        <h4 class="mb-3">Prediction Records</h4>
+                        <h4 class="mb-3">
+                            <i class="fa fa-database"></i> Prediction Records
+                        </h4>
                         <table class="table table-bordered table-striped">
                             <thead class="thead-dark">
                                 <tr>
@@ -218,7 +220,7 @@
                                     <td>{{ record.height }}</td>
                                     <td>{{ record.weight }}</td>
                                     <td>{{ record.bmi }}</td>
-                                    <td>{{ record.result }}</td>
+                                    <td>{{ record.status }}</td>
                                     <td>
                                         <form action="/delete/{{ record.id }}" method="post" style="display: inline;">
                                             <button type="submit" class="btn btn-danger btn-sm">
@@ -227,7 +229,7 @@
                                         </form>
                                     </td>
                                     <td>
-                                        <a href="/edit/{{ record.id }}" class="btn btn-primary btn-sm">
+                                        <a href="/edit/{{ record.id }}" class="btn btn-warning btn-sm">
                                             <i class="fas fa-edit"></i> Edit
                                         </a>
                                     </td>

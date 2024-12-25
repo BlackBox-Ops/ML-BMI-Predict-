@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMI Prediction App</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2>BMI Prediction</h2>
+
+    <!-- Form to input height, weight, and gender for prediction -->
+    <form id="bmi-form" action="#" method="POST">
+        <div class="form-group">
+            <label for="gender">Gender</label>
+            <select class="form-control" id="gender" required>
+                <option value="0">Male</option>
+                <option value="1">Female</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="height">Height (in cm)</label>
+            <input type="number" class="form-control" id="height" placeholder="Enter height" required>
+        </div>
+        <div class="form-group">
+            <label for="weight">Weight (in kg)</label>
+            <input type="number" class="form-control" id="weight" placeholder="Enter weight" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Predict</button>
+    </form>
+
+    <hr>
+
+    <!-- Section to display prediction results -->
+    <div id="prediction-result" class="mt-4">
+        <h4>Prediction Result:</h4>
+        <p id="result-label">Prediction: </p>
+        <p id="bmi-value">BMI: </p>
+    </div>
+
+    <hr>
+
+    <!-- Display the data from the table -->
+    <h3>Records in Database</h3>
+    <table class="table table-bordered" id="records-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Gender</th>
+                <th>Height (cm)</th>
+                <th>Weight (kg)</th>
+                <th>BMI</th>
+                <th>Result</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td>{{ row.gender }}</td>
+                <td>{{ row.height }}</td>
+                <td>{{ row.weight }}</td>
+                <td>{{ row.bmi }}</td>
+                <td>{{ row.status }}</td>
+                <td>
+                    <form action="{{ url_for('delete', id=row.id) }}" method="POST">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+// Handle form submission for BMI prediction
+$('#bmi-form').on('submit', function(event) {
+    event.preventDefault();
+    
+    const gender = $('#gender').val();
+    const height = $('#height').val();
+    const weight = $('#weight').val();
+    
+    $.ajax({
+        url: '/predict',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            gender: parseInt(gender),
+            height: parseFloat(height),
+            weight: parseFloat(weight)
+        }),
+        success: function(response) {
+            // Display the prediction result
+            $('#prediction-result').show();
+            $('#result-label').text('Prediction: ' + response.prediction);
+            $('#bmi-value').text('BMI: ' + response.bmi);
+            
+            // Reload the table of records after adding new data
+            loadTable();
+        },
+        error: function(error) {
+            alert('Error during prediction: ' + error.responseJSON.error);
+        }
+    });
+});
+
+// Load records from the database and update the table
+function loadTable() {
+    $.ajax({
+        url: '/',
+        type: 'GET',
+        success: function(response) {
+            const rows = response.rows;
+            let tableContent = '';
+            
+            rows.forEach(function(row) {
+                tableContent += `<tr>
+                    <td>${row.id}</td>
+                    <td>${row.gender}</td>
+                    <td>${row.height}</td>
+                    <td>${row.weight}</td>
+                    <td>${row.bmi}</td>
+                    <td>${row.result}</td>
+                    <td>
+                        <form action="/delete/${row.id}" method="POST">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>`;
+            });
+            
+            $('#records-table tbody').html(tableContent);
+        },
+        error: function(error) {
+            alert('Error loading records: ' + error.responseText);
+        }
+    });
+}
+
+// Initial load of records
+$(document).ready(function() {
+    loadTable();
+});
+</script>
+
+</body>
+</html>
