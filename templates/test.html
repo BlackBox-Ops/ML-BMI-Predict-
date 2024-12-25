@@ -193,7 +193,6 @@
                         </div>
                     </form>
                 </div>
-
                 <!-- Tabel -->
                 <div class="row">
                     <div class="col-12">
@@ -212,43 +211,28 @@
                                 </tr>
                             </thead>
                             <tbody id="record-table">
-                                <!-- Data tabel -->
+                                {% for record in rows %}
                                 <tr>
-                                    <td>1</td>
-                                    <td>Male</td>
-                                    <td>175</td>
-                                    <td>70</td>
-                                    <td>22.9</td>
-                                    <td>Normal</td>
+                                    <td>{{ record.id }}</td>
+                                    <td>{{ record.gender }}</td>
+                                    <td>{{ record.height }}</td>
+                                    <td>{{ record.weight }}</td>
+                                    <td>{{ record.bmi }}</td>
+                                    <td>{{ record.result }}</td>
                                     <td>
-                                        <button class="btn btn-danger btn-sm">
-                                            <i class="fas fa-trash-alt"></i> Delete
-                                        </button>
+                                        <form action="/delete/{{ record.id }}" method="post" style="display: inline;">
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash-alt"></i> Delete
+                                            </button>
+                                        </form>
                                     </td>
                                     <td>
-                                        <button class="btn btn-primary btn-sm">
+                                        <a href="/edit/{{ record.id }}" class="btn btn-primary btn-sm">
                                             <i class="fas fa-edit"></i> Edit
-                                        </button>
+                                        </a>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Female</td>
-                                    <td>160</td>
-                                    <td>60</td>
-                                    <td>23.4</td>
-                                    <td>Normal</td>
-                                    <td>
-                                        <button class="btn btn-danger btn-sm">
-                                            <i class="fas fa-trash-alt"></i> Delete
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-primary btn-sm">
-                                            <i class="fas fa-edit"></i> Edit
-                                        </button>
-                                    </td>
-                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
