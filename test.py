@@ -73,15 +73,20 @@ def index():
     rows = cur.fetchall()
     cur.close()
     conn.close()
-    return render_template('test.html', rows=[{
-    # tampilkan isi dari tabel 
-        'id': r[0],     
-        'gender': r[1],
-        'height': r[2],
-        'weight': r[3],
-        'bmi': r[4],
-        'status': r[5]
-    } for r in rows])
+    
+    # Convert database rows into a list of dictionaries
+    rows = [
+        {
+            'id': row[0],
+            'gender': row[1],
+            'height': row[2],
+            'weight': row[3],
+            'bmi': row[4],
+            'result': row[5],
+        }
+        for row in rows
+    ]
+    return render_template('test.html', rows=rows)
 
 # buat function untuk prediksi dan perhitungan bmi lalu simpan ke database 
 @app.route('/predict', methods=['POST'])
@@ -118,6 +123,59 @@ def predict_bmi():
 
     except Exception as e:
         return jsonify({"error": f"Prediction error: {e}"}), 500
+    
+# buat function update data 
+def reorder_ids():
+    # reorder the ids in the database to maintain sequential order 
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try :
+        cur.execute("""
+            WITH reordered AS (
+                SELECT id, ROW_NUMBER() OVER () AS new_id
+                FROM bmi_predict
+            )
+            UPDATE bmi_predict
+            SET id = reordered.new_id
+            FROM reordered
+            WHERE bmi_predict.id = reordered.id;
+        """)
+        conn.commit()
+    finally:
+        cur.close()
+        conn.close()
+
+# buat function untuk menghapus data dari database 
+@app.route('/delete/<int:id>', methods=['POST'])
+def delete(id):
+    # delete hasil prediksi dari kolom database 
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        # delete the record with specified id 
+        cur.execute("DELETE FROM bmi_predict WHERE id = %s",  (id,))
+        conn.commit()
+    finally:
+        cur.close()
+        conn.close()
+
+    # call function reorder_ids()
+    reorder_ids()
+
+    return redirect(url_for('index'))
+
+def reset_sequence():
+    """Reset the ID sequence to match the current maximum ID."""
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute("""
+            SELECT setval('predictions_id_seq', (SELECT MAX(id) FROM bmi_predict));
+        """)
+        conn.commit()
+    finally:
+        cur.close()
+        conn.close()
     
 if __name__ == '__main__':
     app.run(debug=True)
