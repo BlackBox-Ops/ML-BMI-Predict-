@@ -17,42 +17,50 @@
                 <h4>Database Records</h4>
             </div>
             <div class="card-body">
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nama</th>
-                            <th>Gender</th>
-                            <th>Height (cm)</th>
-                            <th>Weight (kg)</th>
-                            <th>Details</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in rows %}
-                        <tr>
-                            <td>{{ row.id }}</td>
-                            <td>{{ row.nama }}</td>
-                            <td>{{ row.gender }}</td>
-                            <td>{{ row.height }}</td>
-                            <td>{{ row.weight }}</td>
-                            <td>
-                                <strong>Prediction:</strong> {{ row.status }}<br>
-                                <strong>BMI:</strong> {{ row.bmi }}<br>
-                                <strong>Ideal Weight:</strong> {{ row.ideal_weight }} kg
-                            </td>
-                            <td>
-                                <form action="{{ url_for('delete', id=row.id) }}" method="post" class="d-inline">
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div id="table-container">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nama</th>
+                                <th>Gender</th>
+                                <th>Height (cm)</th>
+                                <th>Weight (kg)</th>
+                                <th>Details</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            {% for row in rows %}
+                            <tr>
+                                <td>{{ row.id }}</td>
+                                <td>{{ row.nama }}</td>
+                                <td>{{ row.gender }}</td>
+                                <td>{{ row.height }}</td>
+                                <td>{{ row.weight }}</td>
+                                <td>
+                                    <strong>Prediction:</strong> {{ row.status }}<br>
+                                    <strong>BMI:</strong> {{ row.bmi }}<br>
+                                    <strong>Ideal Weight:</strong> {{ row.ideal_weight }} kg
+                                </td>
+                                <td>
+                                    <form action="{{ url_for('delete', id=row.id) }}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination -->
+                <nav>
+                    <ul class="pagination justify-content-center" id="pagination">
+                        <!-- Pagination buttons will be dynamically added here -->
+                    </ul>
+                </nav>
             </div>
         </div>
 
@@ -94,6 +102,40 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function () {
+            const rowsPerPage = 5; // Number of rows per page
+    
+            // Function to show rows of a specific page
+            function showPage(page) {
+                const rows = $("#table-body tr");
+                const totalRows = rows.length;
+                const totalPages = Math.ceil(totalRows / rowsPerPage);
+    
+                rows.hide(); // Hide all rows
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                rows.slice(start, end).show();
+    
+                // Update pagination buttons
+                $("#pagination").empty(); // Clear existing pagination
+                for (let i = 1; i <= totalPages; i++) {
+                    $("#pagination").append(`
+                        <li class="page-item ${i === page ? "active" : ""}">
+                            <button class="page-link" data-page="${i}">${i}</button>
+                        </li>
+                    `);
+                }
+            }
+    
+            // Show the first page by default
+            showPage(1);
+    
+            // Handle pagination button clicks
+            $("#pagination").on("click", "button", function () {
+                const page = $(this).data("page");
+                showPage(page);
+            });
+    
+            // Form submission for prediction
             $('#predict-form').on('submit', function (event) {
                 event.preventDefault();
                 const formData = {
@@ -102,15 +144,46 @@
                     height: parseInt($('#height').val()),
                     weight: parseInt($('#weight').val())
                 };
-
+    
                 $.ajax({
                     url: '/predict',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(formData),
                     success: function (response) {
-                        alert(`Prediction: ${response.prediction}\nBMI: ${response.bmi}\nIdeal Weight: ${response.ideal_weight}`);
-                        location.reload();
+                        // Dynamically append the new row to the table
+                        const newRow = `
+                            <tr>
+                                <td>${response.id}</td>
+                                <td>${formData.nama}</td>
+                                <td>${formData.gender == 0 ? "Male" : "Female"}</td>
+                                <td>${formData.height}</td>
+                                <td>${formData.weight}</td>
+                                <td>${response.prediction}</td>
+                                <td>${response.bmi}</td>
+                                <td>${response.ideal_weight}</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm">
+                                        <i class="fas fa-info-circle"></i> Info
+                                    </button>
+                                </td>
+                                <td>
+                                    <form action="/delete/${response.id}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        `;
+                        $("#table-body").append(newRow);
+    
+                        // Reset the form and close the modal
+                        $('#predict-form')[0].reset();
+                        $("#predict-form-modal").addClass("hidden");
+    
+                        // Re-render pagination and show the updated page (always show the first page)
+                        showPage(1);
                     },
                     error: function (xhr) {
                         alert(`Error: ${xhr.responseJSON.error}`);
