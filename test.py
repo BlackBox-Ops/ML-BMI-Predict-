@@ -60,21 +60,20 @@ def calculate_bmi(height, weight):
     height_m = height / 100  # Convert height to meters
     return round(weight / (height_m ** 2), 2)
 
-# Function to calculate ideal weight
-def calculate_ideal_weight(gender, height):
-    if gender.lower() == "male":
-        return round((height - 100) - ((height - 100) * 0.1), 2)
-    else:  # Female
-        return round((height - 100) - ((height - 100) * 0.15), 2)
-
-# Function to reorder IDs starting from 1
+# Function to reorder IDs starting from 3
 def reorder_ids():
     conn = get_db_connection()
     cur = conn.cursor()
     try:
         cur.execute("""
-            ALTER SEQUENCE bmi_predict_id_seq RESTART WITH 1;
-            UPDATE bmi_predict SET id = DEFAULT;
+            WITH reordered AS (
+                SELECT id, ROW_NUMBER() OVER () AS new_id
+                FROM bmi_predict
+            )
+            UPDATE bmi_predict
+            SET id = reordered.new_id
+            FROM reordered
+            WHERE bmi_predict.id = reordered.id;
         """)
         conn.commit()
     finally:
@@ -94,34 +93,28 @@ def index():
     # Convert query result to a list of dictionaries
     rows = [
         {
-            'id': row[0],
-            'nama': row[1],
-            'gender': row[2],
-            'height': row[3],
-            'weight': row[4],
-            'status': row[5],
-            'bmi': row[6],
-            'ideal_weight': row[7]
+            'id': row[5],
+            'gender': row[0],
+            'height': row[1],
+            'weight': row[2],
+            'bmi': row[3],
+            'status': row[4],
         }
         for row in rows
     ]
-    return render_template('app.html', rows=rows)
+    return render_template('test1.html', rows=rows)
 
 # Route for BMI prediction and storing the result in the database
 @app.route('/predict', methods=['POST'])
 def predict_bmi():
     try:
         data = request.get_json()
-        nama = data["nama"]
         gender = "Male" if data["gender"] == 0 else "Female"
         height = data["height"]
         weight = data["weight"]
 
         # Calculate BMI
         bmi = calculate_bmi(height, weight)
-
-        # Calculate ideal weight
-        ideal_weight = calculate_ideal_weight(gender, height)
 
         # Prepare data for prediction
         input_data = np.array([[data['gender'], height, weight]])
@@ -134,8 +127,8 @@ def predict_bmi():
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute(
-            "INSERT INTO bmi_predict (nama, gender, height, weight, bmi, status, ideal_weight) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-            (nama, gender, height, weight, bmi, prediction_label, ideal_weight)
+            "INSERT INTO bmi_predict (gender, height, weight, bmi, status) VALUES (%s, %s, %s, %s, %s)",
+            (gender, height, weight, bmi, prediction_label)
         )
         conn.commit()
         cur.close()
@@ -144,7 +137,7 @@ def predict_bmi():
         # Reorder IDs after inserting new data
         reorder_ids()
 
-        return jsonify({'prediction': prediction_label, 'bmi': bmi, 'ideal_weight': ideal_weight})
+        return jsonify({'prediction': prediction_label, 'bmi': bmi})
 
     except Exception as e:
         return jsonify({"error": f"Prediction error: {e}"}), 500
@@ -165,6 +158,19 @@ def delete(id):
     reorder_ids()
 
     return redirect(url_for('index'))
+
+# Function to reset the ID sequence
+def reset_sequence():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute("""
+            SELECT setval('bmi_predict_id_seq', (SELECT MAX(id) FROM bmi_predict));
+        """)
+        conn.commit()
+    finally:
+        cur.close()
+        conn.close()
 
 # Run the Flask app
 if __name__ == '__main__':
