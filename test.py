@@ -102,7 +102,7 @@ def index():
         }
         for row in rows
     ]
-    return render_template('test1.html', rows=rows)
+    return render_template('app.html', rows=rows)
 
 # Route for BMI prediction and storing the result in the database
 @app.route('/predict', methods=['POST'])
