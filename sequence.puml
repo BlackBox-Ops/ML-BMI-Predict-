@@ -1,0 +1,19 @@
+@startuml SequenceDiagramPredictBMI
+actor User
+participant "AppController" as Controller
+participant "BMICalculator" as Calculator
+participant "Model" as MLModel
+participant "Database" as DB
+
+User -> Controller : POST /predict
+Controller -> Calculator : calculate_bmi(height, weight)
+Calculator --> Controller : BMI
+Controller -> Calculator : calculate_ideal_weight(gender, height)
+Calculator --> Controller : Ideal Weight
+Controller -> MLModel : predict(input_data)
+MLModel --> Controller : Prediction
+Controller -> DB : Insert BMI record
+Controller -> DB : reorder_ids()
+DB --> Controller : Success
+Controller --> User : Prediction Response
+@enduml

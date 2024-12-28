@@ -1,28 +1,29 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, jsonify
 from dotenv import load_dotenv
+import psycopg2
 import joblib
 import numpy as np
 import os
-import psycopg2
-import logging
+import math
 
-# Load environment variables from .env file
+# Load environment variables
 load_dotenv()
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
+# Initialize Flask app
+app = Flask(__name__)
 
-# Load machine learning model
+# Database configuration
+DB_HOST = os.getenv("DB_HOST")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_PORT = os.getenv("DB_PORT")
+
+# Load ML model
 MODEL_PATH = "voting_classifier_model.joblib"
+model = joblib.load(MODEL_PATH)
 
-# Database connection settings from environment variables
-DB_HOST = os.getenv('DB_HOST')
-DB_NAME = os.getenv('DB_NAME')
-DB_USER = os.getenv('DB_USER')
-DB_PASSWORD = os.getenv('DB_PASSWORD')
-DB_PORT = os.getenv('DB_PORT')
-
-# Label mapping for BMI prediction results
+# Label mapping for BMI categories
 LABEL_MAPPING = {
     0: "Extremely Weak",
     1: "Weak",
@@ -32,146 +33,136 @@ LABEL_MAPPING = {
     5: "Extreme Obesity"
 }
 
-# Initialize Flask app
-app = Flask(__name__)
-
-# Load machine learning model function
-def load_model(path):
-    try:
-        return joblib.load(path)
-    except Exception as e:
-        raise RuntimeError(f"Failed to load model: {e}")
-
-# Load the machine learning model
-model = load_model(MODEL_PATH)
-
-# Database connection function
+# Database connection
 def get_db_connection():
     return psycopg2.connect(
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        host=DB_HOST,
-        port=DB_PORT
+        host=DB_HOST, database=DB_NAME, user=DB_USER, password=DB_PASSWORD, port=DB_PORT
     )
 
-# Function to calculate BMI
+# BMI calculation
 def calculate_bmi(height, weight):
-    height_m = height / 100  # Convert height to meters
+    height_m = height / 100  # Convert to meters
     return round(weight / (height_m ** 2), 2)
 
-# Function to reorder IDs starting from 3
+# Ideal weight calculation
+def calculate_ideal_weight(gender, height):
+    if gender.lower() == "male":
+        return round((height - 100) - (0.1 * (height - 100)), 2)
+    else:
+        return round((height - 100) - (0.15 * (height - 100)), 2)
+
+# Reorder IDs
 def reorder_ids():
     conn = get_db_connection()
     cur = conn.cursor()
-    try:
-        cur.execute("""
-            WITH reordered AS (
-                SELECT id, ROW_NUMBER() OVER () AS new_id
-                FROM bmi_predict
-            )
-            UPDATE bmi_predict
-            SET id = reordered.new_id
-            FROM reordered
-            WHERE bmi_predict.id = reordered.id;
-        """)
-        conn.commit()
-    finally:
-        cur.close()
-        conn.close()
+    cur.execute("""
+        ALTER SEQUENCE bmi_predict_id_seq RESTART WITH 1;
+        UPDATE bmi_predict SET id = DEFAULT;
+    """)
+    conn.commit()
+    cur.close()
+    conn.close()
 
-# Route to display all records from the database
-@app.route('/')
+# Home route
+@app.route("/", methods=["GET", "POST"])
 def index():
+    # Initialize default prediction results
+    prediction = None
+    bmi = None
+    ideal_weight = None
+    success = False
+
+    # Pagination parameters
+    page = int(request.args.get("page", 1))
+    per_page = 6
+    offset = (page - 1) * per_page
+
+    # Handle prediction request
+    if request.method == "POST":
+        try:
+            # Get form data
+            nama = request.form.get("nama")
+            gender = int(request.form.get("gender"))
+            height = float(request.form.get("height"))
+            weight = float(request.form.get("weight"))
+
+            # Calculate BMI and ideal weight
+            bmi = calculate_bmi(height, weight)
+            ideal_weight = calculate_ideal_weight("Male" if gender == 0 else "Female", height)
+
+            # Make prediction
+            input_data = np.array([[gender, height, weight]])
+            prediction = LABEL_MAPPING.get(model.predict(input_data)[0], "Unknown")
+
+            # Store result in database
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute(
+                """
+                INSERT INTO bmi_predict (nama, gender, height, weight, bmi, status, ideal_weight)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """,
+                (nama, "Male" if gender == 0 else "Female", height, weight, bmi, prediction, ideal_weight),
+            )
+            conn.commit()
+            cur.close()
+            conn.close()
+            success = True
+        except Exception as e:
+            success = False
+
+    # Fetch records with pagination
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM bmi_predict;")
+    cur.execute("SELECT COUNT(*) FROM bmi_predict")
+    total_rows = cur.fetchone()[0]
+    total_pages = math.ceil(total_rows / per_page)
+
+    cur.execute("SELECT * FROM bmi_predict ORDER BY id LIMIT %s OFFSET %s", (per_page, offset))
     rows = cur.fetchall()
     cur.close()
     conn.close()
 
-    # Convert query result to a list of dictionaries
+    # Convert rows to dictionary format and re-index IDs
     rows = [
         {
-            'id': row[5],
-            'gender': row[0],
-            'height': row[1],
-            'weight': row[2],
-            'bmi': row[3],
-            'status': row[4],
+            "index": idx + 1 + offset,
+            "id": row[0],
+            "nama": row[1],
+            "gender": row[2],
+            "height": row[3],
+            "weight": row[4],
+            "bmi": row[5],
+            "status": row[6],
+            "ideal_weight": row[7],
         }
-        for row in rows
+        for idx, row in enumerate(rows)
     ]
-    return render_template('app.html', rows=rows)
 
-# Route for BMI prediction and storing the result in the database
-@app.route('/predict', methods=['POST'])
-def predict_bmi():
-    try:
-        data = request.get_json()
-        gender = "Male" if data["gender"] == 0 else "Female"
-        height = data["height"]
-        weight = data["weight"]
+    # Render template with prediction and table data
+    return render_template(
+        "Dashboard.html",
+        prediction=prediction,
+        bmi=bmi,
+        ideal_weight=ideal_weight,
+        success=success,
+        rows=rows,
+        page=page,
+        total_pages=total_pages,
+    )
 
-        # Calculate BMI
-        bmi = calculate_bmi(height, weight)
-
-        # Prepare data for prediction
-        input_data = np.array([[data['gender'], height, weight]])
-        prediction = model.predict(input_data)
-
-        # Map prediction result to label
-        prediction_label = LABEL_MAPPING.get(prediction[0], "Unknown")
-
-        # Store prediction in the database
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute(
-            "INSERT INTO bmi_predict (gender, height, weight, bmi, status) VALUES (%s, %s, %s, %s, %s)",
-            (gender, height, weight, bmi, prediction_label)
-        )
-        conn.commit()
-        cur.close()
-        conn.close()
-
-        # Reorder IDs after inserting new data
-        reorder_ids()
-
-        return jsonify({'prediction': prediction_label, 'bmi': bmi})
-
-    except Exception as e:
-        return jsonify({"error": f"Prediction error: {e}"}), 500
-
-# Route to delete a record from the database
-@app.route('/delete/<int:id>', methods=['POST'])
+# Delete record
+@app.route("/delete/<int:id>", methods=["POST"])
 def delete(id):
     conn = get_db_connection()
     cur = conn.cursor()
-    try:
-        cur.execute("DELETE FROM bmi_predict WHERE id = %s", (id,))
-        conn.commit()
-    finally:
-        cur.close()
-        conn.close()
-
-    # Reorder IDs after deletion
+    cur.execute("DELETE FROM bmi_predict WHERE id = %s", (id,))
+    conn.commit()
+    cur.close()
+    conn.close()
     reorder_ids()
-
-    return redirect(url_for('index'))
-
-# Function to reset the ID sequence
-def reset_sequence():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    try:
-        cur.execute("""
-            SELECT setval('bmi_predict_id_seq', (SELECT MAX(id) FROM bmi_predict));
-        """)
-        conn.commit()
-    finally:
-        cur.close()
-        conn.close()
+    return redirect(url_for("index"))
 
 # Run the Flask app
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
