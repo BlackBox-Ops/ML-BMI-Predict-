@@ -1,6 +1,5 @@
 Berikut adalah seluruh penjelasan yang diminta dalam satu template `README.md` yang siap untuk disalin:
 
-```markdown
 # BMI Classification Using Voting Classifier Algorithm
 Model Prediksi BMI
 
