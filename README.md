@@ -1,3 +1,6 @@
+Berikut adalah seluruh penjelasan yang diminta dalam satu template `README.md` yang siap untuk disalin:
+
+```markdown
 # BMI Classification Using Voting Classifier Algorithm
 Model Prediksi BMI
 
@@ -17,34 +20,41 @@ Untuk mengatur proyek ini, ikuti langkah-langkah berikut:
    ```bash
    pip install -r requirements.txt
    ```
-Pastikan Anda memiliki Python 3.7 atau versi yang lebih baru sebelum melanjutkan.
+   Pastikan Anda memiliki Python 3.7 atau versi yang lebih baru sebelum melanjutkan.
 
 3. Masuk ke direktori proyek:
    ```bash
    cd Scripts/
    ```
-4. Dan jalankan kode program di direktori Scripts:
+
+4. Jalankan kode program untuk memulai server API:
    ```bash
    python api_model.py
    ```
 
-5. jika pada kode program api_model.py berhasil dijalankan maka akan tampil alamat address sebagai berikut
+5. Jika `api_model.py` berhasil dijalankan, Anda akan melihat alamat server yang dapat diakses:
    ```bash
-   http://127.0.0.1:8000 
+   http://127.0.0.1:8000
    ```
+   Buka alamat tersebut di browser untuk melihat aplikasi web.
 
 ## Penggunaan
 
-Model ini dilatih menggunakan dataset yang mengandung data terkait BMI. Setelah proyek diatur, Anda dapat menggunakan model ini untuk:
-- Memprediksi kategori BMI individu berdasarkan fitur input mereka.
-- Menganalisis tren BMI pada berbagai demografi (jika memungkinkan).
+Setelah proyek diatur, Anda dapat mengakses aplikasi web yang berisi form untuk memasukkan data BMI (tinggi badan dan berat badan) dan tombol untuk memprediksi hasil kategori BMI berdasarkan input tersebut.
 
 ### Menjalankan Proyek
 1. Siapkan dataset Anda: Pastikan data input Anda mengikuti format yang diharapkan (misalnya, mencakup `tinggi`, `berat`, dan kolom relevan lainnya).
 2. Latih model (jika diperlukan) atau muat model yang sudah dilatih.
-3. Gunakan model untuk membuat prediksi pada data baru.
+3. Gunakan model untuk membuat prediksi pada data baru melalui antarmuka web.
 
-Lihat file `api_model.py` atau skrip terkait untuk instruksi penggunaan spesifik.
+### Menjalankan File `test.py`
+Untuk menguji aplikasi web dan menampilkan form untuk prediksi, jalankan file `test.py` dengan perintah berikut:
+
+```bash
+python test.py
+```
+
+File ini akan menjalankan aplikasi web yang menyertakan form input untuk memasukkan data tinggi badan dan berat badan. Setelah data dimasukkan dan tombol "Prediksi" ditekan, aplikasi akan menampilkan kategori BMI yang diprediksi.
 
 ## Informasi Dataset
 Dataset yang digunakan untuk proyek ini mengandung kolom-kolom berikut:
@@ -73,4 +83,4 @@ Pastikan dataset Anda sudah dibersihkan dan diproses sebelum digunakan dengan mo
 - Pipeline yang mudah digunakan untuk pelatihan dan prediksi.
 - Format input yang fleksibel untuk berbagai struktur dataset.
 
-Silakan sesuaikan dan kembangkan proyek ini sesuai dengan kebutuhan spesifik Anda.
+```
