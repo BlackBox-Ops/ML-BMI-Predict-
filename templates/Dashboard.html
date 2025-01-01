@@ -6,6 +6,7 @@
     <title>BMI Prediction</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* Table styling for SugarCRM-like appearance */
         .table-custom {
@@ -72,14 +73,16 @@
         </div>
         <div class="row mt-3">
             <div class="col-md-12">
-                <button type="submit" class="btn btn-primary">Predict</button>
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="fas fa-chart-bar"></i> Predict
+                </button>
             </div>
         </div>
     </form>
 
     <!-- Display Prediction Results -->
     {% if prediction %}
-    <div id="alertBox" class="alert alert-info mt-4 alert-sm">
+    <div id="alertBox" class="alert alert-info mt-2 alert-sm">
         <i class="bi bi-info-circle"></i>
         <h4>Health Prediction based on weight and height, including BMI and Ideal Weight calculation</h4>
         <div class="form-group">
@@ -106,7 +109,9 @@
     <hr />
 
     <!-- BMI Records Table -->
-    <h3 class="mt-5">BMI Records</h3>
+    <h3 class="mt-5">
+        <i class="fas fa-database"></i> BMI Records
+    </h3>
     <table class="table table-striped table-bordered table-custom">
         <thead>
             <tr>
@@ -115,8 +120,8 @@
                 <th>Gender</th>
                 <th>Height (cm)</th>
                 <th>Weight (kg)</th>
-                <th>BMI</th>
                 <th>Status</th>
+                <th>BMI</th>
                 <th>Ideal Weight (kg)</th>
                 <th>Actions</th>
             </tr>
@@ -129,12 +134,14 @@
                 <td>{{ row.gender }}</td>
                 <td>{{ row.height }}</td>
                 <td>{{ row.weight }}</td>
-                <td>{{ row.bmi }}</td>
                 <td>{{ row.status }}</td>
+                <td>{{ row.bmi }}</td>
                 <td>{{ row.ideal_weight }}</td>
                 <td>
                     <form action="{{ url_for('delete', id=row.id) }}" method="POST" style="display:inline;">
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
                     </form>
                 </td>
             </tr>
@@ -169,13 +176,43 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const alertBox = document.getElementById("alertBox");
-        if (alertBox) {
-            setTimeout(() => {
-                alertBox.style.display = "none";
-            }, 6000); // 1 minute
-        }
+        const predictButton = document.querySelector("#predictButton");
+        const form = document.querySelector("#bmiForm");
+
+        predictButton.addEventListener("click", async (event) => {
+            event.preventDefault();
+
+            // Ambil data input dari form
+            const formData = new FormData(form);
+            const payload = Object.fromEntries(formData.entries());
+
+            try {
+                // Kirim data ke backend menggunakan fetch
+                const response = await fetch("/predict", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Tampilkan hasil prediksi
+                    document.querySelector("#alertBox").style.display = "block";
+                    document.querySelector("#statusResult").value = data.prediction;
+                    document.querySelector("#bmiResult").value = data.bmi;
+                    document.querySelector("#idealWeightResult").value = data.ideal_weight;
+                } else {
+                    console.error("Failed to predict", response.status);
+                }
+            } catch (error) {
+                console.error("Error occurred while predicting:", error);
+            }
+        });
     });
 </script>
+
 </body>
 </html>

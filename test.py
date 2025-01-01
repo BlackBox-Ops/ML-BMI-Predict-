@@ -20,7 +20,7 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_PORT = os.getenv("DB_PORT")
 
 # Load ML model
-MODEL_PATH = "voting_classifier_model.joblib"
+MODEL_PATH = "./models/voting_classifier_model.joblib"
 model = joblib.load(MODEL_PATH)
 
 # Label mapping for BMI categories
